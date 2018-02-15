@@ -1176,8 +1176,7 @@ impl Document {
             }
         }
 
-        rooted_vec!(let mut touches);
-        touches.extend(self.active_touch_points.borrow().iter().cloned());
+        pinned!(let touches: Vec<_> := &**self.active_touch_points.borrow());
         rooted_vec!(let mut target_touches);
         target_touches.extend(self.active_touch_points
                                   .borrow()

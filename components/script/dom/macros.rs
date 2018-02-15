@@ -3,6 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #[macro_export]
+macro_rules! pinned {
+    (let ref mut $name:ident) => {
+        pinned!(let ref mut $name: _);
+    };
+    (let ref mut $name:ident: $ty:ty) => {
+        #[allow(unsafe_code)]
+        let ref mut $name = unsafe {
+            $crate::dom::bindings::pin::Pin::<$ty>::new()
+        };
+    };
+    (let $name:ident: $ty:ty := $expr:expr) => {
+        pinned!(let ref mut $name: $ty);
+        let $name = $crate::dom::bindings::pin::Pin::<$ty>::pin($name, $expr);
+    };
+}
+
+#[macro_export]
 macro_rules! make_getter(
     ( $attr:ident, $htmlname:tt ) => (
         fn $attr(&self) -> DOMString {
